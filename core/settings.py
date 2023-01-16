@@ -26,8 +26,8 @@ cloudinary.config(
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-a$s91y%d3rd5#768%1dv@1#71!fiv92hzj@jb&7bvco%r6os)x'
-REFRESH_SECRET_KEY = 'sdkhkh-86%&^**wuhdh6546%*(kshdh@jdklsdhk09&^%$#kjhsdjhkshd'
+SECRET_KEY = os.getenv(key='SECRET_KEY')
+REFRESH_SECRET_KEY = os.getenv(key='REFRESH_SECRET_KEY')
 ACCESS_TOKEN_EXPIRY = 30
 REFRESH_TOKEN_EXPIRY = 24*60
 
