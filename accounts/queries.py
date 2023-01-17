@@ -10,41 +10,46 @@ from core.utils.file_utils import save_profile_return_url, upload_profile_to_clo
 logger = logging.getLogger('accounts')
 session: Session = settings.DB_SESSION
 
-def get_user_by_email(email):
-    is_user = False
+def is_user_by_email(email):
     try:
         user = session.query(User).filter(User.email==email).first()
         session.commit()
         if user:
-            is_user = True
+            return True
+        return False
     except Exception as e:
-        logger.error(f'queries/get_user_by_email: {e}')
+        logger.error(f'queries/is_user_by_email: {e}')
         session.rollback()
-        is_user = False
-    return is_user
+        return False
 
-def get_user_by_username(username):
-    is_user = False
+def is_user_by_username(username):
     try:
         user = session.query(User).filter(User.username==username).first()
         session.commit()
         if user:
-            is_user = True
+            return True
+        return False
     except Exception as e:
-        logger.error(f'queries/get_user_by_username: {e}')
+        logger.error(f'queries/is_user_by_username: {e}')
         session.rollback()
-        is_user = False
-
-    return is_user
+        return False
 
 def register_user(data):
-    user = None
     try:
-        name = data['name']
         username = data['username']
         email = data['email']
+        first_name = data['first_name']
+        last_name = data['first_name']
         password = data['password']
         profile_picture = data['profile_picture']
+        dob = data['dob']
+        age = data['age']
+        gender = data['gender']
+        address = data['address']
+        is_hod = data['is_hod']
+        is_staff = data['is_staff']
+        is_teacher = data['is_teacher']
+        is_student = data['is_student']
 
         profile_picture_url = None
         if profile_picture is not None:
@@ -53,28 +58,37 @@ def register_user(data):
 
         hashed_password = hash_password(password)
         new_user = User(
-            name = name,
             username = username,
             email = email,
+            first_name = first_name,
+            last_name = last_name,
             password = hashed_password,
-            profile_picture = profile_picture_url
+            profile_picture = profile_picture_url,
+            dob = dob,
+            age = age,
+            gender = gender,
+            address = address,
+            is_hod = is_hod,
+            is_staff = is_staff,
+            is_teacher = is_teacher,
+            is_student = is_student,
         )
         session.add(new_user)
         session.commit()
         session.refresh(new_user)
-        user = new_user
+        data = row2dict(new_user)
+        data.pop('password')
+        return data
 
     except Exception as e:
         logger.error(f'queries/register_user: {e}')
         session.rollback()
-        user = None
-
-    return row2dict(user)
+        return None
 
 def get_user(user_id):
     try:
         user = session.query(
-            User.user_id.label('user_id')
+            User
         ).filter(
             User.user_id==user_id,
             User.is_active==1
@@ -88,13 +102,13 @@ def get_user(user_id):
         session.rollback()
         return None
 
-def get_actual_user_by_username(username):
+def get_user_by_username(username):
     try:
         user = session.query(User).filter(User.username==username).one_or_none()
         if user:
             return row2dict(user)
         return None
     except Exception as e:
-        logger.error(f'queries/get_actual_user_by_username: {e}')
+        logger.error(f'queries/get_user_by_username: {e}')
         session.rollback()
         return None

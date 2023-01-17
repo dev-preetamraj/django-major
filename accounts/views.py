@@ -5,10 +5,10 @@ from rest_framework.views import APIView
 
 
 from .queries import (
-    get_user_by_email,
-    get_user_by_username,
+    is_user_by_email,
+    is_user_by_username,
     register_user,
-    get_actual_user_by_username
+    get_user_by_username
 )
 
 from core.utils.password_utils import verify_password
@@ -20,11 +20,31 @@ class RegisterUser(APIView):
     permission_classes = [permissions.AllowAny]
     def post(self, request):
         try:
-            data = request.data
-            if not 'name' in data:
-                data['name'] = None
+            data_ = request.data
+            data = data_.copy()
+            if not 'first_name' in data:
+                data['first_name'] = None
+            if not 'last_name' in data:
+                data['last_name'] = None
             if not 'profile_picture' in data:
                 data['profile_picture'] = None
+            if not 'dob' in data:
+                data['dob'] = None
+            if not 'age' in data:
+                data['age'] = None
+            if not 'gender' in data:
+                data['gender'] = None
+            if not 'address' in data:
+                data['address'] = None
+            if not 'is_hod' in data:
+                data['is_hod'] = '0'
+            if not 'is_staff' in data:
+                data['is_staff'] = '0'
+            if not 'is_teacher' in data:
+                data['is_teacher'] = '0'
+            if not 'is_student' in data:
+                data['is_student'] = '0'
+            
 
             if not 'username' in data:
                 return Response({
@@ -54,13 +74,13 @@ class RegisterUser(APIView):
                 }, status=status.HTTP_400_BAD_REQUEST)
             password1 = data['password1']
             
-            if get_user_by_email(email):
+            if is_user_by_email(email):
                 return Response({
                     'error': 'User with this email already exists',
                     'data': None
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            if get_user_by_username(username):
+            if is_user_by_username(username):
                 return Response({
                     'error': 'User with this username already exists',
                     'data': None
@@ -109,7 +129,7 @@ class Authorization(APIView):
                         'data': None
                     }, status=status.HTTP_400_BAD_REQUEST)
                 
-                user = get_actual_user_by_username(data['username'])
+                user = get_user_by_username(data['username'])
                 if user is None:
                     return Response({
                         'error': 'User not found',

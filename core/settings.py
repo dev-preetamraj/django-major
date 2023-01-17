@@ -1,5 +1,4 @@
 import os
-import json
 from pathlib import Path
 from urllib import parse
 from sqlalchemy import create_engine, MetaData
